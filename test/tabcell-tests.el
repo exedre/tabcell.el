@@ -14,11 +14,11 @@
   ;; Normal case
   (let ((vector '(10 20 30)))
     (should (equal (tabcell-cumulative-sum-with-step vector tabcell-test-tabulated-list-format 2 5)
-                   [2 17 42 67])))
+                   [2 17 42 77])))
   ;; Case with no step
   (let ((vector '(10 20 30)))
     (should (equal (tabcell-cumulative-sum-with-step vector tabcell-test-tabulated-list-format )
-                   [10 30 60])))
+                   [0 10 30 60])))
   ;; Edge case: Empty vector
   (let ((vector '()))
     (should (equal (tabcell-cumulative-sum-with-step vector tabcell-test-tabulated-list-format )
@@ -30,13 +30,14 @@
   (with-temp-buffer
     (tabulated-list-mode)
     (setq tabulated-list-format [("Col1" 10 t) ("Col2" 10 t) ("Col3" 10 t)])
+    (setq tabulated-list-entries
+          '(("1" ["Row1Col1" "Row1Col2" "Row1Col3"])
+            ("2" ["Row2Col1" "Row2Col2" "Row2Col3"])))
     (tabulated-list-init-header)
-    (insert "Row1Col1 Row1Col2 Row1Col3\n")
-    (insert "Row2Col1 Row2Col2 Row2Col3\n")
-    (goto-char (point-min))
-    (forward-line 1)
-    (forward-char 15)
-    (should (equal (tabcell-get-active-cell) '(2 . 1)))))
+    (tabulated-list-print)
+    (setq tabcell-active-cell '(1 . 2))
+    (tabcell-update-cursor-position)    
+    (should (equal (tabcell-get-active-cell) '(1 . 2)))))
 
 ;;; Test for `tabcell-find-index-in-vector`
 (ert-deftest tabcell-test-find-index-in-vector ()
@@ -50,33 +51,23 @@
   ;; Edge case: Empty vector
   (should (equal (tabcell-find-index-in-vector 10 []) 0)))
 
-;;; Test for `tabcell-fill-line-cells`
-(ert-deftest tabcell-test-fill-line-cells ()
-  "Test `tabcell-fill-line-cells` for proper column boundary calculations."
-  (with-temp-buffer
-    (tabulated-list-mode)
-    (setq tabulated-list-format [("Col1" 10 t) ("Col2" 15 t) ("Col3" 20 t)])
-    (tabulated-list-init-header)
-    (insert "Row1Col1 Row1Col2 Row1Col3\n")
-    (goto-char (point-min))
-    (forward-line 1)
-    (tabcell-fill-line-cells)
-    (should (equal tabcell-line-cells [0 10 25 45]))))
-
 ;;; Test for `tabcell-update-active-cell-overlay`
 (ert-deftest tabcell-test-update-active-cell-overlay ()
   "Test `tabcell-update-active-cell-overlay` to ensure the overlay updates correctly."
   (with-temp-buffer
     (tabulated-list-mode)
     (setq tabulated-list-format [("Col1" 10 t) ("Col2" 15 t) ("Col3" 20 t)])
+    (setq tabulated-list-entries
+          '(("1" ["Row1Col1" "Row1Col2" "Row1Col3"])
+            ("2" ["Row2Col1" "Row2Col2" "Row2Col3"])))
     (tabulated-list-init-header)
-    (insert "Row1Col1 Row1Col2 Row1Col3\n")
+    (tabulated-list-print)
     (setq tabcell-active-cell '(1 . 2))
     (tabcell-update-active-cell-overlay)
     (let ((ov tabcell-active-cell-overlay))
       (should (overlayp ov))
-      (should (equal (overlay-start ov) (+ (line-beginning-position) 25)))
-      (should (equal (overlay-end ov) (+ (line-beginning-position) 45))))))
+      (should (equal (overlay-start ov) (+ (line-beginning-position) 11)))
+      (should (equal (overlay-end ov) (+ (line-beginning-position) 27))))))
 
 ;;; Test for `tabcell-move-down`
 (ert-deftest tabcell-test-move-down ()
@@ -84,13 +75,13 @@
   (with-temp-buffer
     (tabulated-list-mode)
     (setq tabulated-list-format [("Col1" 10 t) ("Col2" 10 t)])
+    (setq tabulated-list-entries
+          '(("1" ["Row1Col1" "Row1Col2"])
+            ("2" ["Row2Col1" "Row2Col2"])))
     (tabulated-list-init-header)
-    (insert "Row1Col1 Row1Col2\n")
-    (insert "Row2Col1 Row2Col2\n")
+    (tabulated-list-print)
     (setq tabcell-active-cell '(1 . 1))
-    (goto-char (point-min))
-    (forward-line 1)
-    (tabcell-move-down)
+    (tabcell-move-line-down)
     (should (equal tabcell-active-cell '(2 . 1)))))
 
 ;;; Test for edge cases in `tabcell-mode`

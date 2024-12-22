@@ -150,20 +150,6 @@ If no such element is found, return the length of VEC."
     index))
 
 
-(defun tabcell-fill-line-cells ()
-  "Populate `tabcell-line-cells` with column boundaries of the current row."
-  (let* ((entry (tabulated-list-get-entry))
-         (columns (tabcell-cumulative-sum-with-step
-                   (cl-map 'list (lambda (field)
-                                   (length field))
-                           entry)
-		   tabulated-list-format
-		   tabulated-list-padding
-                   1)))
-    (setq tabcell-line-cells columns)
-    (tabcall-debug "tabcell-fill-line-cells: %S" columns)))
-
-
 (defun tabcell-update-cursor-position ()
   "Move the cursor to the active cell based on `tabcell-active-cell`."
   (let ((row (car tabcell-active-cell))

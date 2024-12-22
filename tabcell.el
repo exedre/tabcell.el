@@ -25,14 +25,6 @@
 
 ;; -------------------------------------------------------------------------------- cell-mode
 
-(defvar tabcell-debug nil
-  "Log debugging information. FORMAT-STRING and ARGS behave like `message`.")
-
-(defun tabcall-debug (format-string &rest args)
-  "Log debugging information. FORMAT-STRING and ARGS behave like `message`."
-  (if tabcell-debug
-      (apply #'message (concat "[DEBUG] " format-string) args)))
-
 (defvar-local tabcell-active-cell '(1 . 0)
   "The currently active cell in the tabular list, represented as (row . column).")
 
@@ -75,7 +67,6 @@ If STEP is not provided, it defaults to 0."
       (setq sum (+ sum (nth i vector) step))
       (aset result (1+ i)
             (max sum (nth 1 (elt formats i)))))
-    (tabcall-debug "tabcell-cumulative-sum-with-step: %S" result)
     result))
 
 
@@ -87,14 +78,12 @@ If STEP is not provided, it defaults to 0."
       (while (< (1+ offset) (- column tabulated-list-padding))
         (setq offset (+ offset 1 (nth 1 (elt tabulated-list-format col))))
         (setq col (1+ col)))
-      (tabcall-debug "tabcell-get-active-cell: row=%d, column=%d" row col)
       (cons row col))))
 
 
 (defun tabcell-track-active-cell (event)
   "Track the currently active cell and update its overlay."
-  (interactive (list last-input-event))
-  (tabcall-debug "tabcell-track-active-cell-in: RC=%S" tabcell-active-cell)  
+  (interactive (list last-input-event))  
   (let* ((coord  (posn-col-row (event-start event)))
            (bpoint (posn-point  (event-start event)))
            (row (1+ (cdr coord))))
@@ -121,15 +110,13 @@ If STEP is not provided, it defaults to 0."
                    minor-mode-overriding-map-alist))
         ;; Activate the mode
         (setq tabcell-active-cell '(1 . 0))
-        (setq tabcell-active-cell-overlay nil)
-        (tabcall-debug "tabcell-mode: Activated."))
+        (setq tabcell-active-cell-overlay nil))
     ;; Deactivate the mode
     (when tabcell-active-cell-overlay
       (delete-overlay tabcell-active-cell-overlay)
       (setq tabcell-active-cell-overlay nil)
       (setq minor-mode-overriding-map-alist
-            (assq-delete-all 'tabcell-mode minor-mode-overriding-map-alist))
-      (tabcall-debug "tabcell-mode: Deactivated."))))
+            (assq-delete-all 'tabcell-mode minor-mode-overriding-map-alist)))))
 
 
 (defun tabcell-find-index-in-vector (num vec)
@@ -146,7 +133,6 @@ If no such element is found, return the length of VEC."
 (defun tabcell-cell-columns (column)
   "Retrieve column index within the current row."
   (let ((index (tabcell-find-index-in-vector column tabcell-line-cells)))
-    (tabcall-debug "tabcell-cell-columns: column=%d, index=%d" column index)
     index))
 
 
@@ -158,8 +144,7 @@ If no such element is found, return the length of VEC."
     (forward-line (1- row))
     (goto-char (line-beginning-position))
     (forward-char (1- (tabcell-calculate-column-offset column)))
-    (tabcell-next-column)
-    (tabcall-debug "tabcell-update-cursor-position: row=%d, column=%d, point=%d" row column (point))))
+    (tabcell-next-column))))
 
 
 (defun tabcell-calculate-column-offset (column)
@@ -178,8 +163,7 @@ If no such element is found, return the length of VEC."
              (overlayp tabcell-active-cell-overlay))
     (delete-overlay tabcell-active-cell-overlay))
   (setq tabcell-active-cell-overlay (make-overlay cell-start cell-end))
-  (overlay-put tabcell-active-cell-overlay 'face 'highlight)
-  (tabcall-debug "tabcell-highlight: cell-start=%d, cell-end=%d" cell-start cell-end))
+  (overlay-put tabcell-active-cell-overlay 'face 'highlight))
 
 
 ;; -------------------------------------------------------------------------------- mouvements
@@ -210,8 +194,7 @@ DIRECTION should be a symbol: 'up, 'down, 'left, 'right, 'home, 'end,
       ('page-down (let ((new-row (min (1- (line-number-at-pos (point-max)))
 				      (+ row (window-body-height)))))
                     (setq tabcell-active-cell (cons new-row column)))))
-    (tabcell-update-cursor-position)
-    (tabcall-debug "tabcell-move: direction=%s current-cell=%S" direction tabcell-active-cell)))
+    (tabcell-update-cursor-position)))
 
 
 (defun tabcell-move-line-up ()
@@ -284,8 +267,7 @@ If ARG is provided, move that many columns."
           (let* ((cell (tabcell-get-active-cell))
                  (row (car cell))
                  (column (cdr cell)))
-            (setq tabcell-active-cell (cons row column))
-            (tabcall-debug "tabcell-list-column: row=%d, column=%d" row column)))))))
+            (setq tabcell-active-cell (cons row column))))))))
 
 
 (defun tabcell-previous-column (&optional arg)
@@ -308,8 +290,7 @@ If ARG is provided, move that many columns."
           (let* ((cell (tabcell-get-active-cell))
                  (row (car cell))
                  (column (cdr cell)))
-            (setq tabcell-active-cell (cons row column))
-            (tabcall-debug "tabcell-previous-column: row=%d, column=%d" row column))))))))
+            (setq tabcell-active-cell (cons row column)))))))))
 
 
 ;; Add advice to handle container refresh
@@ -318,7 +299,6 @@ If ARG is provided, move that many columns."
   "Advice to refresh tabulated-list content for tabcell mode."
   (when (derived-mode-p 'tabcell-mode)
     (setq-local tabcell-line-cells nil)
-    (tabcell-update-cursor-position)
-    (tabcall-debug "tabcell-refresh: Refreshed container.")))
+    (tabcell-update-cursor-position)))
 
 (provide 'tabcell)

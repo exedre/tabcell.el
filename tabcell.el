@@ -25,7 +25,7 @@
 
 ;; -------------------------------------------------------------------------------- cell-mode
 
-(defvar tabcell-debug t
+(defvar tabcell-debug nil
   "Log debugging information. FORMAT-STRING and ARGS behave like `message`.")
 
 (defun tabcall-debug (format-string &rest args)

@@ -1,0 +1,66 @@
+
+* Tabcell: Active Cell Tracking for Tabulated Lists
+
+Tabcell is a minor mode for Emacs that enhances navigation and usability within `tabulated-list-mode`. It provides active cell tracking and intuitive keyboard shortcuts for seamless movement across table rows and columns.
+
+** Features
+
+- Highlights the currently active cell in a tabulated list.
+- Supports keyboard navigation across rows, columns, and pages.
+- Includes customizable key bindings for efficient table navigation.
+
+** Requirements
+
+- Emacs 25.1 or higher
+- `cl-lib` library version 0.5 or higher
+
+** Installation
+
+1. Place `tabcell.el` in your Emacs load path.
+2. Add the following to your Emacs configuration file:
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/path/to/tabcell")
+(require 'tabcell)
+#+end_src
+
+** Usage
+
+Activate `tabcell-mode` in a buffer running `tabulated-list-mode`:
+
+#+begin_src emacs-lisp
+(tabcell-mode 1)
+#+end_src
+
+This will enable active cell tracking and the associated key bindings.
+
+** Key Bindings
+
+| Key        | Description                               |
+|------------+-------------------------------------------|
+| `<home>`   | Move to the first cell in the current row |
+| `<end>`    | Move to the last cell in the current row  |
+| `<up>`     | Move to the cell above                    |
+| `<down>`   | Move to the cell below                    |
+| `<left>`   | Move to the previous column               |
+| `<right>`  | Move to the next column                   |
+| `C-<home>` | Move to the first cell in the sheet       |
+| `C-<end>`  | Move to the last cell in the sheet        |
+| `<prior>`  | Move one page up in the sheet             |
+| `<next>`   | Move one page down in the sheet           |
+
+** Debugging
+
+To enable debugging messages, set the variable `tabcell-debug` to `t`:
+
+#+begin_src emacs-lisp
+(setq tabcell-debug t)
+#+end_src
+
+** Development
+
+Feel free to contribute to the project on GitHub: [[https://github.com/exedre/tabcell.el]]
+
+** License
+
+This code is distributed under the GNU General Public License v3. See the LICENSE file for details.

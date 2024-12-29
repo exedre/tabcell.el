@@ -49,14 +49,6 @@ This will enable active cell tracking and the associated key bindings.
 | `<prior>`  | Move one page up in the sheet             |
 | `<next>`   | Move one page down in the sheet           |
 
-** Debugging
-
-To enable debugging messages, set the variable `tabcell-debug` to `t`:
-
-#+begin_src emacs-lisp
-(setq tabcell-debug t)
-#+end_src
-
 ** Development
 
 Feel free to contribute to the project on GitHub: [[https://github.com/exedre/tabcell.el]]

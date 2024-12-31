@@ -1,7 +1,7 @@
 ;;; tabcell.el --- Active cell tracking for tabulated lists -*- lexical-binding: t -*-
 
 ;; Author: Emmanuele Somma <emmanuele@exedre.org>
-;; Version: 0.2.0
+;; Version: 0.3.0
 ;; Package-Requires: ((emacs "25.1") (cl-lib "0.5"))
 ;; Keywords: convenience, tabulated-list
 ;; URL: https://github.com/exedre/tabcell.el
